@@ -77,6 +77,10 @@ class _StopwatchScreenState extends State<StopwatchScreen> {
     _lapBreakTimes.insert(0, '${_lapBreakTimes.length + 1} $time');
   }
 
+  void exChange(_allTime) {
+    Text(_allTime);
+  }
+
   void _allTime(String time) {
     (_all.insert(0, time));
   }
@@ -104,7 +108,7 @@ class _StopwatchScreenState extends State<StopwatchScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Center(child: const Text('순공시간')),
+        title: const Center(child: Text('순공시간')),
       ),
       body: Column(
         children: [
@@ -141,13 +145,19 @@ class _StopwatchScreenState extends State<StopwatchScreen> {
                   _lapBreakTimes.map((e) => Center(child: Text(e))).toList(),
             ),
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           SizedBox(
             width: 200,
             height: 100,
             child: ListView(
-              children:
-                  _all.map((e) => Center(child: Text(e))).take(1).toList(),
+              children: _all
+                  .map((e) => Center(
+                          child: Text(
+                        e,
+                        textAlign: TextAlign.center,
+                      )))
+                  .take(1)
+                  .toList(),
             ),
           ),
           const Spacer(),
@@ -181,10 +191,8 @@ class _StopwatchScreenState extends State<StopwatchScreen> {
                 backgroundColor: Colors.green,
                 onPressed: () {
                   setState(() {
-                    _allTime('''공부시간
-$hour시 $min분 $sec초 
-쉰시간
-$breakHour시 $breakMin분 $breakSec초''');
+                    _allTime(
+                        '공부시간\n$hour시 $min분 $sec초\n쉰시간\n$breakHour시 $breakMin분 $breakSec초');
                     _studyPause();
                     _breakPause();
                   });

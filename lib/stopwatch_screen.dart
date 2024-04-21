@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:flip_card/flip_card.dart';
+import 'package:flip_card/flip_card_controller.dart';
 import 'package:flutter/material.dart';
 
 class StopwatchScreen extends StatefulWidget {
@@ -16,6 +18,7 @@ class _StopwatchScreenState extends State<StopwatchScreen> {
   int _studyTime = 0;
   int _breakTime = 0;
   bool _isRunning = false;
+  bool _isFront = true;
 
   final List<String> _lapTimes = [];
   final List<String> _lapBreakTimes = [];
@@ -94,6 +97,8 @@ class _StopwatchScreenState extends State<StopwatchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    FlipCardController _controller = FlipCardController();
+
     int seconds = _studyTime ~/ 100;
     String sec = '${seconds % 60}'.padLeft(2, '0');
     String min = '${(seconds ~/ 60) % 60}'.padLeft(2, '0');
@@ -112,40 +117,54 @@ class _StopwatchScreenState extends State<StopwatchScreen> {
       ),
       body: Column(
         children: [
-          const SizedBox(height: 30),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                '$hour시 $min분 $sec초',
-                style: const TextStyle(fontSize: 50),
-              ),
-              // Text(
-              //   hundredth,
-              // ),
-            ],
-          ),
-          SizedBox(
-            width: 200,
-            height: 100,
-            child: ListView(
-              children: _lapTimes.map((e) => Center(child: Text(e))).toList(),
+          FlipCard(
+            flipOnTouch: false,
+            controller: _controller,
+            front: Column(
+              children: [
+                const SizedBox(height: 30),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      '$hour시 $min분 $sec초',
+                      style: const TextStyle(fontSize: 50),
+                    ),
+                    // Text(
+                    //   hundredth,
+                    // ),
+                  ],
+                ),
+                SizedBox(
+                  width: 200,
+                  height: 100,
+                  child: ListView(
+                    children:
+                        _lapTimes.map((e) => Center(child: Text(e))).toList(),
+                  ),
+                ),
+              ],
+            ),
+            back: Column(
+              children: [
+                const SizedBox(height: 30),
+                Text(
+                  '$breakHour시 $breakMin분 $breakSec초',
+                  style: const TextStyle(fontSize: 50),
+                ),
+                SizedBox(
+                  width: 200,
+                  height: 100,
+                  child: ListView(
+                    children: _lapBreakTimes
+                        .map((e) => Center(child: Text(e)))
+                        .toList(),
+                  ),
+                ),
+              ],
             ),
           ),
-          Text(
-            '$breakHour시 $breakMin분 $breakSec초',
-            style: const TextStyle(fontSize: 50),
-          ),
-          SizedBox(
-            width: 200,
-            height: 100,
-            child: ListView(
-              children:
-                  _lapBreakTimes.map((e) => Center(child: Text(e))).toList(),
-            ),
-          ),
-          const SizedBox(height: 20),
           SizedBox(
             width: 200,
             height: 100,
@@ -168,6 +187,9 @@ class _StopwatchScreenState extends State<StopwatchScreen> {
                 backgroundColor: Colors.orange,
                 onPressed: () {
                   _reset();
+                  if (_controller.state?.isFront == false) {
+                    _controller.toggleCard();
+                  }
                 },
                 child: const Icon(Icons.refresh),
               ),
@@ -181,6 +203,9 @@ class _StopwatchScreenState extends State<StopwatchScreen> {
                     if (_isRunning == true && int.parse(breakHundredth) > 0) {
                       _recodeBreakLapTime('$breakHour시 $breakMin분 $breakSec초');
                     }
+                    if (int.parse(hundredth) > 0) {
+                      _controller.toggleCard();
+                    }
                   });
                 },
                 child: _isRunning
@@ -192,7 +217,7 @@ class _StopwatchScreenState extends State<StopwatchScreen> {
                 onPressed: () {
                   setState(() {
                     _allTime(
-                        '공부시간\n$hour시 $min분 $sec초\n쉰시간\n$breakHour시 $breakMin분 $breakSec초');
+                        '공부시간\n$hour시 $min분 $sec초\n휴식시간\n$breakHour시 $breakMin분 $breakSec초');
                     _studyPause();
                     _breakPause();
                   });

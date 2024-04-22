@@ -2,7 +2,10 @@ import 'dart:async';
 
 import 'package:flip_card/flip_card.dart';
 import 'package:flip_card/flip_card_controller.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:lottie/lottie.dart';
 
 class StopwatchScreen extends StatefulWidget {
   const StopwatchScreen({super.key});
@@ -73,11 +76,11 @@ class _StopwatchScreenState extends State<StopwatchScreen> {
   }
 
   void _recodeLapTime(String time) {
-    _lapTimes.insert(0, '${_lapTimes.length + 1} $time');
+    _lapTimes.insert(0, '${_lapTimes.length + 1}. $time');
   }
 
   void _recodeBreakLapTime(String time) {
-    _lapBreakTimes.insert(0, '${_lapBreakTimes.length + 1} $time');
+    _lapBreakTimes.insert(0, '${_lapBreakTimes.length + 1}. $time');
   }
 
   void exChange(_allTime) {
@@ -113,53 +116,71 @@ class _StopwatchScreenState extends State<StopwatchScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Center(child: Text('순공시간')),
+        title: const Center(child: Text('')),
       ),
       body: Column(
         children: [
+          SizedBox(height: 60),
           FlipCard(
             flipOnTouch: false,
             controller: _controller,
-            front: Column(
+            front: Stack(
               children: [
-                const SizedBox(height: 30),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      '$hour시 $min분 $sec초',
-                      style: const TextStyle(fontSize: 50),
-                    ),
-                    // Text(
-                    //   hundredth,
-                    // ),
-                  ],
+                Transform.scale(
+                  scale: 2,
+                  child: Lottie.asset(
+                    'assets/lottie/book.json',
+                    fit: BoxFit.cover,
+                  ),
                 ),
-                SizedBox(
-                  width: 200,
-                  height: 100,
-                  child: ListView(
-                    children:
-                        _lapTimes.map((e) => Center(child: Text(e))).toList(),
+                Center(
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 80),
+                      Text(
+                        '$hour : $min : $sec ',
+                        style: const TextStyle(fontSize: 50, ),
+                      ),
+                      SizedBox(
+                        width: 200,
+                        height: 100,
+                        child: ListView(
+                          children: _lapTimes
+                              .map((e) => Center(child: Text(e)))
+                              .toList(),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
-            back: Column(
+            back: Stack(
               children: [
-                const SizedBox(height: 30),
-                Text(
-                  '$breakHour시 $breakMin분 $breakSec초',
-                  style: const TextStyle(fontSize: 50),
+                Transform.scale(
+                  scale: 2,
+                  child: Lottie.asset(
+                    'assets/lottie/coffee.json',
+                  ),
                 ),
-                SizedBox(
-                  width: 200,
-                  height: 100,
-                  child: ListView(
-                    children: _lapBreakTimes
-                        .map((e) => Center(child: Text(e)))
-                        .toList(),
+                Center(
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 80),
+                      Text(
+                        '$breakHour : $breakMin : $breakSec ',
+                        style: const TextStyle(fontSize: 50, fontFamily: 'KCC-Hanbit'),
+                      ),
+                      SizedBox(
+                        width: 200,
+                        height: 100,
+                        child: ListView(
+                          children: _lapBreakTimes
+                              .map((e) => Center(child: Text(e)))
+                              .toList(),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -198,10 +219,10 @@ class _StopwatchScreenState extends State<StopwatchScreen> {
                   setState(() {
                     _clickButton();
                     if (_isRunning == false) {
-                      _recodeLapTime('$hour시 $min분 $sec초');
+                      _recodeLapTime('$hour : $min : $sec');
                     }
                     if (_isRunning == true && int.parse(breakHundredth) > 0) {
-                      _recodeBreakLapTime('$breakHour시 $breakMin분 $breakSec초');
+                      _recodeBreakLapTime('$breakHour : $breakMin : $breakSec');
                     }
                     if (int.parse(hundredth) > 0) {
                       _controller.toggleCard();
@@ -217,7 +238,7 @@ class _StopwatchScreenState extends State<StopwatchScreen> {
                 onPressed: () {
                   setState(() {
                     _allTime(
-                        '공부시간\n$hour시 $min분 $sec초\n휴식시간\n$breakHour시 $breakMin분 $breakSec초');
+                        '공부시간\n$hour : $min : $sec\n휴식시간\n$breakHour : $breakMin : $breakSec');
                     _studyPause();
                     _breakPause();
                   });
